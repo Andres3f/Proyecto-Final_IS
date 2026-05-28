@@ -25,3 +25,16 @@ export const updateTaskStatus = async (taskId: number, status: TaskStatusUpdate)
   const response = await api.patch<Task>(`/api/v1/tasks/${taskId}/status`, status);
   return response.data;
 };
+
+export const updateTask = async (taskId: number, task: Partial<TaskCreate> & { status?: string }): Promise<Task> => {
+  const response = await api.put<Task>(`/api/v1/tasks/${taskId}`, task);
+  return response.data;
+};
+
+export const deleteTask = async (taskId: number): Promise<void> => {
+  await api.delete(`/api/v1/tasks/${taskId}`);
+};
+
+export const inviteUserToProject = async (projectId: number, email: string): Promise<void> => {
+  await api.post(`/api/v1/projects/${projectId}/invite`, { email });
+};

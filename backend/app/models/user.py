@@ -14,3 +14,4 @@ class User(Base):
 
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
     tasks = relationship("Task", back_populates="responsible_user", cascade="all, delete-orphan")
+    project_memberships = relationship("ProjectMember", back_populates="user", cascade="all, delete-orphan")
