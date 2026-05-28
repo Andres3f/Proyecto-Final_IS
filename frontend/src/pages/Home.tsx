@@ -8,8 +8,13 @@ import {
   fetchProjectTasks,
   fetchProjects,
   updateTaskStatus,
+  updateTask,
+  deleteTask,
+  inviteUserToProject,
 } from "../services/project";
 import type { Project, Task, TaskCreate, TaskStatus } from "../types/task";
+import { TaskActionModal } from "../components/TaskActionModal";
+import { InviteUserModal } from "../components/InviteUserModal";
 
 const statusLabels: Record<TaskStatus, string> = {
   pending: "Pendiente",
@@ -33,6 +38,8 @@ function HomePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [working, setWorking] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   useEffect(() => {
     fetchProfile()
@@ -92,6 +99,36 @@ function HomePage() {
     }
   };
 
+  const handleEditTask = async (title: string, description: string, status: TaskStatus) => {
+    if (!editingTask) return;
+    try {
+      const updated = await updateTask(editingTask.id, { title, description, status });
+      setTasks((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (err) {
+      setError("No se pudo actualizar la tarea.");
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    if (!editingTask) return;
+    try {
+      await deleteTask(editingTask.id);
+      setTasks((current) => current.filter((item) => item.id !== editingTask.id));
+    } catch (err) {
+      setError("No se pudo eliminar la tarea.");
+    }
+  };
+
+  const handleInviteUser = async (email: string) => {
+    if (!project) return;
+    try {
+      await inviteUserToProject(project.id, email);
+      setError(""); // Clear any previous errors
+    } catch (err: any) {
+      throw err; // Let the modal handle the error
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 px-4 py-10">
       <div className="mx-auto max-w-5xl rounded-3xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-slate-950/50">
@@ -111,7 +148,7 @@ function HomePage() {
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
           <div className="rounded-3xl bg-slate-950 p-6 shadow-inner shadow-slate-900/40">
             <h2 className="text-xl font-semibold text-white">Perfil</h2>
-            {error && <p className="mt-3 text-rose-400">{error}</p>}
+            {error && <p className="mt-3 text-rose-400 text-sm">{error}</p>}
             {profile ? (
               <div className="mt-4 space-y-3 text-slate-300">
                 <p>
@@ -126,7 +163,15 @@ function HomePage() {
             )}
 
             <div className="mt-8 rounded-3xl bg-slate-900 p-5">
-              <h3 className="text-lg font-semibold text-white">Proyecto</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">Proyecto</h3>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="rounded-full bg-emerald-500 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-emerald-400"
+                >
+                  + Invitar
+                </button>
+              </div>
               {project ? (
                 <div className="mt-4 space-y-2 text-slate-300">
                   <p>
@@ -185,7 +230,7 @@ function HomePage() {
               {tasks.map((task) => (
                 <div key={task.id} className="rounded-3xl border border-slate-800 bg-slate-900 p-5">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-lg font-semibold text-white">{task.title}</h3>
                       <p className="mt-2 text-slate-400">{task.description || "Sin descripción"}</p>
                     </div>
@@ -193,16 +238,24 @@ function HomePage() {
                       <span className="rounded-full bg-slate-800 px-3 py-1 text-sm font-semibold text-cyan-300">
                         {statusLabels[task.status]}
                       </span>
-                      {nextStatus[task.status] ? (
+                      <div className="flex gap-2">
                         <button
-                          onClick={() => handleChangeStatus(task)}
-                          className="rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-emerald-400"
+                          onClick={() => setEditingTask(task)}
+                          className="rounded-full bg-amber-500 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-amber-400"
                         >
-                          {task.status === "pending" ? "Marcar como En progreso" : "Marcar como Completada"}
+                          Editar
                         </button>
-                      ) : (
-                        <span className="text-xs text-slate-500">Finalizada</span>
-                      )}
+                        {nextStatus[task.status] ? (
+                          <button
+                            onClick={() => handleChangeStatus(task)}
+                            className="rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-emerald-400"
+                          >
+                            {task.status === "pending" ? "En progreso" : "Completada"}
+                          </button>
+                        ) : (
+                          <span className="text-xs text-slate-500">Finalizada</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -211,6 +264,22 @@ function HomePage() {
           )}
         </div>
       </div>
+
+      {editingTask && (
+        <TaskActionModal
+          task={editingTask}
+          isOpen={!!editingTask}
+          onClose={() => setEditingTask(null)}
+          onSave={handleEditTask}
+          onDelete={handleDeleteTask}
+        />
+      )}
+
+      <InviteUserModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onInvite={handleInviteUser}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ from app.api import deps
 from app import crud
 from app.schemas.project import Project, ProjectCreate
 from app.schemas.task import Task, TaskCreate
+from app.schemas.project_member import ProjectMember, ProjectInviteRequest, ProjectInvitation
 
 router = APIRouter(tags=["Projects"])
 
@@ -32,3 +33,28 @@ def create_project_task(project_id: int, task_in: TaskCreate, db: Session = Depe
     if not project or project.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
     return crud.task.create_task(db, task_in=task_in, project_id=project_id, responsible_user_id=current_user.id)
+
+
+@router.get("/{project_id}/members", response_model=list[ProjectMember])
+def get_project_members(project_id: int, db: Session = Depends(deps.get_db), current_user=Depends(deps.get_current_active_user)):
+    project = crud.project.get_project_by_id(db, project_id=project_id)
+    if not project or project.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+    return crud.project_member.get_project_members(db, project_id=project_id)
+
+
+@router.post("/{project_id}/invite", response_model=ProjectInvitation, status_code=status.HTTP_201_CREATED)
+def invite_user_to_project(project_id: int, invite_in: ProjectInviteRequest, db: Session = Depends(deps.get_db), current_user=Depends(deps.get_current_active_user)):
+    project = crud.project.get_project_by_id(db, project_id=project_id)
+    if not project or project.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the project owner can invite members")
+    
+    # Check if email is already a member
+    user = crud.user.get_user_by_email(db, email=invite_in.email)
+    if user:
+        existing_member = crud.project_member.get_project_member(db, project_id=project_id, user_id=user.id)
+        if existing_member:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User is already a member of this project")
+    
+    # Create invitation
+    return crud.project_member.create_project_invitation(db, project_id=project_id, invited_email=invite_in.email, invited_by_user_id=current_user.id)

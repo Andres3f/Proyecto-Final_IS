@@ -13,6 +13,12 @@ class TaskCreate(TaskBase):
     pass
 
 
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[TaskStatusType] = None
+
+
 class TaskStatusUpdate(BaseModel):
     status: TaskStatusType
 
