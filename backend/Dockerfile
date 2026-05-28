@@ -13,5 +13,6 @@ WORKDIR /app
 COPY --from=builder /install /install
 COPY --from=builder /app /app
 ENV PATH="/install/bin:$PATH"
+ENV PYTHONPATH="/install/lib/python3.11/site-packages:$PYTHONPATH"
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
