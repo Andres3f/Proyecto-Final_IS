@@ -1,0 +1,38 @@
+# Root ignores
+.env
+.DS_Store
+.vscode/
+.idea/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+venv/
+.venv/
+
+# Python caches
+backend/__pycache__/
+backend/*.py[cod]
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.venv/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.turbo/
+
+# Docker
+docker-compose.override.yml
+*.env.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# System
+*.pem
