@@ -2,12 +2,12 @@ import api from "./api";
 import type { Project, Task, TaskCreate, TaskStatusUpdate } from "../types/task";
 
 export const fetchProjects = async (): Promise<Project[]> => {
-  const response = await api.get<Project[]>("/api/v1/projects");
+  const response = await api.get<Project[]>("/api/v1/projects/");
   return response.data;
 };
 
 export const createProject = async (name: string, description?: string): Promise<Project> => {
-  const response = await api.post<Project>("/api/v1/projects", { name, description });
+  const response = await api.post<Project>("/api/v1/projects/", { name, description });
   return response.data;
 };
 

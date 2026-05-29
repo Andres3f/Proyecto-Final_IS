@@ -1,22 +1,25 @@
 import { FormEvent, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { getApiErrorMessage } from "../services/auth";
+
 
 function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError("");
     try {
-      await login(email, password);
+      await login(email, password, remember);
       navigate("/");
     } catch (err) {
-      setError("Correo o contraseña inválidos.");
+      setError(getApiErrorMessage(err, "Correo o contraseña inválidos."));
     }
   };
 
@@ -26,6 +29,15 @@ function LoginPage() {
         <h1 className="text-3xl font-semibold text-white mb-6">Iniciar sesión</h1>
         <p className="text-slate-400 mb-6">Accede a tu panel con tu correo y contraseña.</p>
         <form className="space-y-5" onSubmit={handleSubmit}>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={remember}
+                        onChange={(e) => setRemember(e.target.checked)}
+                        className="accent-cyan-500"
+                      />
+                      <span className="text-slate-300">Recordarme</span>
+                    </label>
           <label className="block">
             <span className="text-slate-300">Correo electrónico</span>
             <input

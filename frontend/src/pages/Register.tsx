@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { getApiErrorMessage } from "../services/auth";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function RegisterPage() {
       await register(email, fullName, password);
       navigate("/login");
     } catch (err) {
-      setError("No se pudo crear la cuenta. Verifica los datos.");
+      setError(getApiErrorMessage(err, "No se pudo crear la cuenta. Verifica los datos."));
     }
   };
 

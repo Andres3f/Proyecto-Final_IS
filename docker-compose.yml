@@ -11,7 +11,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   backend:
     build:
@@ -28,7 +28,7 @@ services:
       DATABASE_NAME: fastapi_db
       API_V1_STR: /api/v1
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./backend:/app
 
@@ -36,11 +36,11 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: http://localhost:8000
+        VITE_API_URL: http://localhost:8001
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8001
     ports:
       - "5173:4173"
 

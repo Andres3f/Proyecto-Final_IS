@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken, removeToken } from "../lib/storage";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
@@ -8,7 +9,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -18,8 +19,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
+    const status = error.response?.status;
+    const url: string = error.config?.url ?? "";
+    const isAuthRequest = url.includes("/auth/login") || url.includes("/auth/register");
+
+    if (status === 401 && !isAuthRequest) {
+      removeToken();
       window.location.href = "/login";
     }
     return Promise.reject(error);
