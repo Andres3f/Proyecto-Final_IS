@@ -14,7 +14,7 @@ function LoginPage() {
     setError("");
     try {
       await login(email, password);
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError("Correo o contraseña inválidos.");
     }

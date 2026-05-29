@@ -4,13 +4,96 @@ Monorepo con backend en FastAPI y frontend en React + Vite.
 
 ## Estructura
 
-- `backend/`: API en Python con FastAPI, SQLAlchemy, Alembic y JWT.
-- `frontend/`: App React en TypeScript con Vite, TailwindCSS y React Router.
+- `backend/`: API en Python con FastAPI, SQLAlchemy, Alembic, JWT y autenticación con bcrypt.
+- `frontend/`: App React en TypeScript con Vite, TailwindCSS, React Router, axios y protección de rutas.
 - `docker-compose.yml`: Orquesta servicios `backend`, `frontend` y `postgres`.
+
+Estructura del proyecto:
+
+```text
+Proyecto-Final_IS/
+├── README.md
+├── docker-compose.yml
+├── backend/
+│   ├── Dockerfile
+│   ├── alembic.ini
+│   ├── requirements.txt
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── database.py
+│   │   ├── api/
+│   │   │   ├── __init__.py
+│   │   │   ├── deps.py
+│   │   │   ├── api_v1/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── api.py
+│   │   │   │   ├── endpoints/
+│   │   │   │   │   ├── auth.py
+│   │   │   │   │   ├── users.py
+│   │   │   │   │   ├── projects.py
+│   │   │   │   │   ├── tasks.py
+│   │   ├── core/
+│   │   │   ├── config.py
+│   │   │   ├── security.py
+│   │   ├── crud/
+│   │   │   ├── user.py
+│   │   │   ├── project.py
+│   │   │   ├── task.py
+│   │   │   ├── project_member.py
+│   │   ├── models/
+│   │   │   ├── user.py
+│   │   │   ├── project.py
+│   │   │   ├── task.py
+│   │   │   ├── project_member.py
+│   │   ├── schemas/
+│   │   │   ├── user.py
+│   │   │   ├── token.py
+│   │   │   ├── project.py
+│   │   │   ├── task.py
+│   │   │   ├── project_member.py
+│   │   ├── utils/
+│   │   │   ├── http.py
+│   ├── alembic/
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   ├── versions/
+│   │   │   ├── 001_add_project_members.py
+├── frontend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   ├── vite.config.ts
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   ├── index.css
+│   │   ├── components/
+│   │   │   ├── InviteUserModal.tsx
+│   │   │   ├── SectionWrapper.tsx
+│   │   │   ├── TaskActionModal.tsx
+│   │   ├── hooks/
+│   │   │   ├── useAuth.ts
+│   │   ├── lib/
+│   │   │   ├── storage.ts
+│   │   ├── pages/
+│   │   │   ├── Home.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   ├── services/
+│   │   │   ├── api.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── project.ts
+│   │   ├── types/
+│   │   │   ├── auth.ts
+│   │   │   ├── task.ts
+```
 
 ## Backend
 
-### Instalar dependencias
+### Instalación
 
 ```bash
 cd backend
@@ -42,9 +125,17 @@ alembic revision --autogenerate -m "crear tablas iniciales"
 alembic upgrade head
 ```
 
+### Funcionalidades del backend
+
+- Registro de usuario con validación de email único y contraseña mínima de 8 caracteres.
+- Hash de contraseñas con bcrypt (`passlib[bcrypt]`).
+- Autenticación JWT con `python-jose`.
+- Modelo `User` con relación one-to-many a `Project`.
+- Dependencias `get_current_user` y `get_current_active_user` para proteger rutas.
+
 ## Frontend
 
-### Instalar dependencias
+### Instalación
 
 ```bash
 cd frontend
@@ -57,6 +148,13 @@ npm install
 cd frontend
 npm run dev -- --host 0.0.0.0
 ```
+
+### Funcionalidades del frontend
+
+- Página `/register` con validación de contraseña y redirección a `/login`.
+- Página `/dashboard` protegida con token JWT.
+- Formulario de creación de proyectos y listado de proyectos del usuario autenticado.
+- Interceptor de axios para adjuntar JWT automáticamente en peticiones y manejar 401.
 
 ## Docker
 
@@ -74,12 +172,14 @@ docker compose down
 
 ## Endpoints principales
 
-- `GET /health`
-- `POST /api/v1/auth/register`
-- `POST /api/v1/auth/login`
-- `GET /api/v1/users/me`
+- `POST /api/v1/auth/register` - Registro de usuario.
+- `POST /api/v1/auth/login` - Login y obtención de token JWT.
+- `GET /api/v1/users/me` - Información del usuario autenticado.
+- `POST /api/v1/projects` - Crear proyecto (requiere JWT).
+- `GET /api/v1/projects` - Listar proyectos del usuario autenticado.
 
 ## Notas
 
 - El frontend consume la API configurada en `VITE_API_URL`.
+- El token JWT se guarda en `localStorage`.
 - La base de datos PostgreSQL se monta en el volumen `db_data`.

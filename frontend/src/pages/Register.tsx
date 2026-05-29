@@ -13,11 +13,17 @@ function RegisterPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError("");
+
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
     try {
       await register(email, fullName, password);
       navigate("/login");
-    } catch (err) {
-      setError("No se pudo crear la cuenta. Verifica los datos.");
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || "No se pudo crear la cuenta. Verifica los datos.");
     }
   };
 
