@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 
 
 class UserBase(BaseModel):
@@ -9,6 +9,12 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+    @validator("password")
+    def password_strength(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("La contraseña debe tener al menos 8 caracteres")
+        return value
 
 
 class User(UserBase):
