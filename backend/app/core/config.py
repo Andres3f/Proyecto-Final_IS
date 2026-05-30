@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        """Prioriza DATABASE_URL (para Render)"""
+        """Prioriza DATABASE_URL (para Render) y fallback para desarrollo local con Docker Compose"""
         if self.DATABASE_URL and self.DATABASE_URL.strip():
             return self.DATABASE_URL.strip()
         
