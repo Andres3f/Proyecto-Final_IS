@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: proyecto-final-is-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440
+      - key: API_V1_STR
+        value: /api/v1
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: proyecto-final-is-db
+          property: connectionString
+
+  - type: web
+    name: proyecto-final-is-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: proyecto-final-is-backend
+          property: host
+
+databases:
+  - name: proyecto-final-is-db
+    databaseName: fastapi_db
+    user: postgres

@@ -1,6 +1,11 @@
 {
   "name": "proyecto-final-is",
   "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": "20.x",
+    "pnpm": "10.28.0"
+  },
   "scripts": {
     "install:backend": "cd backend && python -m pip install -r requirements.txt",
     "install:frontend": "pnpm --dir frontend install",

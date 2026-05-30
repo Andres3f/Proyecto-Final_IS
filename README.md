@@ -170,6 +170,20 @@ docker compose up --build
 docker compose down
 ```
 
+## Render
+
+El frontend debe desplegarse con `pnpm`, no con `npm`.
+
+Configuración del servicio frontend si se crea manualmente en Render:
+
+```bash
+Root Directory: frontend
+Build Command: corepack enable && pnpm install --frozen-lockfile && pnpm build
+Publish Directory: dist
+```
+
+El archivo `render.yaml` define el backend, frontend y base de datos para crear los servicios como Blueprint en Render.
+
 ## Endpoints principales
 
 - `POST /api/v1/auth/register` - Registro de usuario.

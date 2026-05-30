@@ -38,7 +38,10 @@ class Settings(BaseSettings):
     def database_url(self) -> str:
         """Prioriza DATABASE_URL (para Render) y fallback para desarrollo local con Docker Compose"""
         if self.DATABASE_URL and self.DATABASE_URL.strip():
-            return self.DATABASE_URL.strip()
+            database_url = self.DATABASE_URL.strip()
+            if database_url.startswith("postgres://"):
+                return database_url.replace("postgres://", "postgresql://", 1)
+            return database_url
         
         # Fallback para desarrollo local con Docker Compose
         return (
