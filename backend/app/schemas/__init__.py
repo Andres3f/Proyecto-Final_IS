@@ -1,4 +1,4 @@
-from app.schemas.project import Project, ProjectCreate
+from app.schemas.project import Project, ProjectCreate, ProjectUpdate
 from app.schemas.task import Task, TaskCreate, TaskStatusUpdate
 from app.schemas.token import Token, TokenData
 from app.schemas.user import User, UserCreate, UserBase
@@ -11,6 +11,7 @@ __all__ = [
     "TokenData",
     "Project",
     "ProjectCreate",
+    "ProjectUpdate",
     "Task",
     "TaskCreate",
     "TaskStatusUpdate",
