@@ -1,25 +1,23 @@
 FROM node:20-alpine AS builder
 
 WORKDIR /app
-RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package*.json ./
+RUN npm install
 
 COPY . .
 ARG VITE_API_URL=http://localhost:8000
 ENV VITE_API_URL=$VITE_API_URL
-RUN pnpm build
+RUN npm run build
 
 FROM node:20-alpine AS runner
 
 WORKDIR /app
-RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package*.json ./
+RUN npm install
 
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 4173
-CMD ["pnpm", "preview", "--host", "0.0.0.0"]
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0"]

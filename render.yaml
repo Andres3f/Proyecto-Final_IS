@@ -23,7 +23,7 @@ services:
     name: proyecto-final-is-frontend
     env: static
     rootDir: frontend
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
       - key: NODE_VERSION
