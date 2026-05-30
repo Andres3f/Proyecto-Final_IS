@@ -7,7 +7,15 @@ import app.models  # noqa: F401
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
-Base.metadata.create_all(bind=engine)
+
+@app.on_event("startup")
+def on_startup() -> None:
+    """Ensure database tables are available on startup.
+
+    For production deploys, prefer Alembic migrations en lugar de create_all().
+    """
+    Base.metadata.create_all(bind=engine)
+
 
 app.add_middleware(
     CORSMiddleware,
