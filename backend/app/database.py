@@ -41,6 +41,7 @@ try:
         pool_pre_ping=True,      # Muy importante en Render
         pool_size=10,
         max_overflow=20,
+        pool_timeout=30,
         connect_args=_get_connect_args(database_url),
     )
 

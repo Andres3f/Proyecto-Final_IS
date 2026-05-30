@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
     # Database
+    # Use Render-managed DATABASE_URL when available. Otherwise use local Docker Compose defaults.
     DATABASE_URL: str | None = Field(None, env="DATABASE_URL")
     DATABASE_USER: str = Field("postgres", env="DATABASE_USER")
     DATABASE_PASSWORD: str = Field("postgres", env="DATABASE_PASSWORD")
