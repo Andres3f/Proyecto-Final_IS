@@ -139,14 +139,14 @@ alembic upgrade head
 
 ```bash
 cd frontend
-pnpm install
+npm install
 ```
 
 ### Ejecutar localmente
 
 ```bash
 cd frontend
-pnpm dev -- --host 0.0.0.0
+npm run dev -- --host 0.0.0.0
 ```
 
 ### Funcionalidades del frontend
@@ -172,13 +172,13 @@ docker compose down
 
 ## Render
 
-El frontend debe desplegarse con `pnpm`, no con `npm`.
+El frontend se despliega con `npm`.
 
 Configuración del servicio frontend si se crea manualmente en Render:
 
 ```bash
 Root Directory: frontend
-Build Command: corepack enable && pnpm install --frozen-lockfile && pnpm build
+Build Command: npm install && npm run build
 Publish Directory: dist
 ```
 

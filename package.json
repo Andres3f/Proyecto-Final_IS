@@ -1,16 +1,15 @@
 {
   "name": "proyecto-final-is",
   "private": true,
-  "packageManager": "pnpm@10.28.0",
+  "packageManager": "npm@10.8.2",
   "engines": {
-    "node": "20.x",
-    "pnpm": "10.28.0"
+    "node": "20.x"
   },
   "scripts": {
     "install:backend": "cd backend && python -m pip install -r requirements.txt",
-    "install:frontend": "pnpm --dir frontend install",
+    "install:frontend": "cd frontend && npm install",
     "backend:dev": "cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
-    "frontend:dev": "pnpm --dir frontend dev -- --host 0.0.0.0",
+    "frontend:dev": "cd frontend && npm run dev -- --host 0.0.0.0",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down"
   }
