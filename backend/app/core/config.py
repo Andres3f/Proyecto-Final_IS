@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # ==================== VARIABLES PRINCIPALES ====================
     PROJECT_NAME: str = "TaskFlow"
 
-    # Secretos
+    # Auth
     SECRET_KEY: str = Field(..., env="SECRET_KEY")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     DATABASE_HOST: str = Field("db", env="DATABASE_HOST")
     DATABASE_PORT: int = Field(5432, env="DATABASE_PORT")
     DATABASE_NAME: str = Field("fastapi_db", env="DATABASE_NAME")
+
+    # API
+    API_V1_STR: str = Field("/api/v1", env="API_V1_STR")
 
     ENVIRONMENT: str = Field("development", env="ENVIRONMENT")
 
