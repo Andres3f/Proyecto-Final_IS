@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "FastAPI Auth App"
     SECRET_KEY: str = Field(..., env="SECRET_KEY")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    DATABASE_URL: str | None = Field(None, env="DATABASE_URL")
     DATABASE_USER: str = Field("postgres", env="DATABASE_USER")
     DATABASE_PASSWORD: str = Field("postgres", env="DATABASE_PASSWORD")
     DATABASE_HOST: str = Field("db", env="DATABASE_HOST")
@@ -20,6 +21,9 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
+
         return (
             f"postgresql+psycopg2://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
             f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
