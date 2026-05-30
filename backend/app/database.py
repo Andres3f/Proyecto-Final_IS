@@ -4,7 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import ArgumentError
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-from app.core.config import settings
+from app.core.config import get_settings
+
+settings = get_settings()
 
 
 def _should_require_ssl(database_url: str) -> bool:
@@ -12,7 +14,6 @@ def _should_require_ssl(database_url: str) -> bool:
     if parsed.hostname is None:
         return False
     return parsed.hostname not in {"localhost", "127.0.0.1", "db"}
-
 
 def _get_connect_args(database_url: str) -> dict[str, str]:
     if settings.DATABASE_URL and _should_require_ssl(database_url) and "sslmode=" not in database_url:
