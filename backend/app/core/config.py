@@ -11,6 +11,7 @@ class Settings(BaseSettings):
         case_sensitive=True,
     )
 
+    # ==================== VARIABLES PRINCIPALES ====================
     PROJECT_NAME: str = "TaskFlow"
 
     # Auth
@@ -18,9 +19,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
-    # Database
-    # Use Render-managed DATABASE_URL when available. Otherwise use local Docker Compose defaults.
+    # Base de Datos - Prioridad a DATABASE_URL (importante para Render)
     DATABASE_URL: str | None = Field(None, env="DATABASE_URL")
+
+    # Variables para fallback local (Docker Compose)
     DATABASE_USER: str = Field("postgres", env="DATABASE_USER")
     DATABASE_PASSWORD: str = Field("postgres", env="DATABASE_PASSWORD")
     DATABASE_HOST: str = Field("db", env="DATABASE_HOST")
@@ -34,9 +36,11 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        """Prioriza DATABASE_URL (para Render)"""
         if self.DATABASE_URL and self.DATABASE_URL.strip():
             return self.DATABASE_URL.strip()
         
+        # Fallback para desarrollo local con Docker Compose
         return (
             f"postgresql+psycopg2://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
             f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
@@ -45,6 +49,7 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings() -> Settings:
+    """Usar esta función para obtener settings en toda la aplicación"""
     return Settings()
 
 
