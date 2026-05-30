@@ -139,14 +139,14 @@ alembic upgrade head
 
 ```bash
 cd frontend
-npm install
+pnpm install
 ```
 
 ### Ejecutar localmente
 
 ```bash
 cd frontend
-npm run dev -- --host 0.0.0.0
+pnpm dev -- --host 0.0.0.0
 ```
 
 ### Funcionalidades del frontend
@@ -177,6 +177,7 @@ docker compose down
 - `GET /api/v1/users/me` - Información del usuario autenticado.
 - `POST /api/v1/projects` - Crear proyecto (requiere JWT).
 - `GET /api/v1/projects` - Listar proyectos del usuario autenticado.
+- `PUT /api/v1/projects/{project_id}` - Editar proyecto propio (requiere JWT).
 
 ## Notas
 

@@ -41,11 +41,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+
       - name: Install frontend dependencies
-        run: cd frontend && npm install
+        run: pnpm --dir frontend install --frozen-lockfile
 
       - name: Build frontend
-        run: cd frontend && npm run build
+        run: pnpm --dir frontend build
 
       - name: Validate Docker Compose config
         run: docker compose config

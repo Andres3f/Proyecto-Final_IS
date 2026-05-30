@@ -11,6 +11,14 @@ export const createProject = async (name: string, description?: string): Promise
   return response.data;
 };
 
+export const updateProject = async (
+  projectId: number,
+  project: { name: string; description?: string | null },
+): Promise<Project> => {
+  const response = await api.put<Project>(`/api/v1/projects/${projectId}`, project);
+  return response.data;
+};
+
 export const fetchProjectTasks = async (projectId: number): Promise<Task[]> => {
   const response = await api.get<Task[]>(`/api/v1/projects/${projectId}/tasks`);
   return response.data;

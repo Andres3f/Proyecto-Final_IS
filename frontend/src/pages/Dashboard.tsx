@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchProfile } from "../services/auth";
-import { createProject, fetchProjects } from "../services/project";
+import { createProject, fetchProjects, updateProject } from "../services/project";
 import { useAuth } from "../hooks/useAuth";
 import type { Project } from "../types/task";
 
@@ -12,8 +12,12 @@ function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editingLoading, setEditingLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -54,6 +58,44 @@ function DashboardPage() {
       setError(err?.response?.data?.detail || "No se pudo crear el proyecto.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const startEditingProject = (project: Project) => {
+    setEditingProjectId(project.id);
+    setEditName(project.name);
+    setEditDescription(project.description || "");
+    setError("");
+  };
+
+  const cancelEditingProject = () => {
+    setEditingProjectId(null);
+    setEditName("");
+    setEditDescription("");
+  };
+
+  const handleEditSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!editingProjectId) return;
+    if (!editName.trim()) {
+      setError("El nombre del proyecto es obligatorio.");
+      return;
+    }
+
+    setError("");
+    setEditingLoading(true);
+
+    try {
+      const updatedProject = await updateProject(editingProjectId, {
+        name: editName.trim(),
+        description: editDescription.trim() || null,
+      });
+      setProjects((current) => current.map((project) => (project.id === updatedProject.id ? updatedProject : project)));
+      cancelEditingProject();
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || "No se pudo actualizar el proyecto.");
+    } finally {
+      setEditingLoading(false);
     }
   };
 
@@ -139,8 +181,59 @@ function DashboardPage() {
               <div className="mt-6 space-y-4">
                 {projects.map((project) => (
                   <div key={project.id} className="rounded-3xl border border-slate-800 bg-slate-900 p-5">
-                    <h3 className="text-lg font-semibold text-white">{project.name}</h3>
-                    <p className="mt-2 text-slate-400">{project.description || "Sin descripción"}</p>
+                    {editingProjectId === project.id ? (
+                      <form className="space-y-4" onSubmit={handleEditSubmit}>
+                        <label className="block">
+                          <span className="text-slate-300">Nombre del proyecto</span>
+                          <input
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            required
+                            className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-slate-300">Descripción</span>
+                          <textarea
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                            rows={3}
+                          />
+                        </label>
+                        <div className="flex flex-wrap gap-3">
+                          <button
+                            type="submit"
+                            disabled={editingLoading}
+                            className="rounded-2xl bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {editingLoading ? "Guardando..." : "Guardar cambios"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEditingProject}
+                            disabled={editingLoading}
+                            className="rounded-2xl border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+                          <p className="mt-2 text-slate-400">{project.description || "Sin descripción"}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => startEditingProject(project)}
+                          className="rounded-2xl border border-cyan-500/50 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400 hover:bg-cyan-500/10"
+                        >
+                          Editar
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.api import deps
 from app import crud
-from app.schemas.project import Project, ProjectCreate
+from app.schemas.project import Project, ProjectCreate, ProjectUpdate
 from app.schemas.task import Task, TaskCreate
 from app.schemas.project_member import ProjectMember, ProjectInviteRequest, ProjectInvitation
 
@@ -17,6 +17,16 @@ def create_project(project_in: ProjectCreate, db: Session = Depends(deps.get_db)
 @router.get("/", response_model=list[Project])
 def read_projects(db: Session = Depends(deps.get_db), current_user=Depends(deps.get_current_active_user)):
     return crud.project.get_projects_by_owner(db, owner_id=current_user.id)
+
+
+@router.put("/{project_id}", response_model=Project)
+def update_project(project_id: int, project_in: ProjectUpdate, db: Session = Depends(deps.get_db), current_user=Depends(deps.get_current_active_user)):
+    project = crud.project.get_project_by_id(db, project_id=project_id)
+    if not project or project.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+    if project_in.name is not None and not project_in.name.strip():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Project name is required")
+    return crud.project.update_project(db, project=project, project_in=project_in)
 
 
 @router.get("/{project_id}/tasks", response_model=list[Task])
