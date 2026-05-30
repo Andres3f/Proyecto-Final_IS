@@ -4,6 +4,10 @@
   "version": "0.0.1",
   "type": "module",
   "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": "20.x",
+    "pnpm": "10.28.0"
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
